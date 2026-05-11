@@ -26,18 +26,21 @@ export default function VendorEnlistmentPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("/api/vendor-enlistment", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.ownerName,
-          email: form.email || "noreply@vendor.com",
+          companyName: form.companyName,
+          ownerName: form.ownerName,
           phone: form.phone,
-          subject: `भेन्डर सूचीकरण — ${form.companyName}`,
-          message: `व्यवसाय: ${form.businessType}\nPAN: ${form.panNo}\nठेगाना: ${form.address}\n${form.description}`,
+          email: form.email,
+          address: form.address,
+          panNo: form.panNo,
+          businessType: form.businessType,
+          description: form.description,
         }),
       });
       const data = await res.json();
-      if (res.ok) { setTrackingId("VND" + Date.now().toString().slice(-6)); toast.success("आवेदन दर्ता भयो!"); }
+      if (res.ok && data.trackingId) { setTrackingId(data.trackingId); toast.success("आवेदन दर्ता भयो!"); }
       else toast.error(data.error || "त्रुटि भयो।");
     } catch { toast.error("सर्भर त्रुटि।"); }
     finally { setSubmitting(false); }

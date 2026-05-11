@@ -43,6 +43,8 @@ export async function GET(req: Request) {
         loanApplications: { orderBy: { createdAt: "desc" }, take: 5, select: { id: true, trackingId: true, loanType: true, status: true, createdAt: true } },
         kycApplications: { orderBy: { createdAt: "desc" }, take: 3, select: { id: true, trackingId: true, status: true, createdAt: true } },
         grievances: { orderBy: { createdAt: "desc" }, take: 5, select: { id: true, trackingId: true, subject: true, status: true, createdAt: true } },
+        transactions: { orderBy: { createdAt: "desc" }, take: 10, select: { id: true, type: true, amount: true, balance: true, description: true, createdAt: true } },
+        notifications: { orderBy: { createdAt: "desc" }, take: 10, select: { id: true, title: true, message: true, type: true, isRead: true, createdAt: true } },
       },
     });
     if (!member) return NextResponse.json({ error: "Not found" }, { status: 404 });

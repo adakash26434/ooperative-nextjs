@@ -33,7 +33,7 @@ export default function MemberDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [trackingResult, setTrackingResult] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState({ name: "", phone: "", address: "", gender: "", currentPassword: "", newPassword: "" });
-  const [activity, setActivity] = useState<{ loans: any[]; kyc: any[]; grievances: any[] } | null>(null);
+  const [activity, setActivity] = useState<{ loans: any[]; kyc: any[]; grievances: any[]; transactions: any[]; notifications: any[] } | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("member_session");
@@ -48,7 +48,7 @@ export default function MemberDashboard() {
     if (parsed.id) {
       fetch(`/api/member/profile?id=${parsed.id}`)
         .then((r) => r.json())
-        .then((d) => setActivity({ loans: d.loanApplications || [], kyc: d.kycApplications || [], grievances: d.grievances || [] }))
+        .then((d) => setActivity({ loans: d.loanApplications || [], kyc: d.kycApplications || [], grievances: d.grievances || [], transactions: d.transactions || [], notifications: d.notifications || [] }))
         .catch(() => {});
     }
   }, [router]);
@@ -335,6 +335,44 @@ export default function MemberDashboard() {
                                 <span className="ml-2 text-gray-700">{l.loanType}</span>
                               </div>
                               <StatusBadge status={l.status} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                  {/* Transactions */}
+                  <Card>
+                    <CardHeader><h3 className="font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4" /> कारोबार विवरण</h3></CardHeader>
+                    <CardBody>
+                      {activity.transactions.length === 0 ? <p className="text-sm text-gray-400">कुनै कारोबार छैन।</p> : (
+                        <div className="space-y-2">
+                          {activity.transactions.map((t: any) => (
+                            <div key={t.id} className="flex items-center justify-between text-sm border-b border-gray-50 pb-2">
+                              <div>
+                                <span className={`font-semibold ${t.type === "credit" ? "text-green-600" : "text-red-500"}`}>{t.type === "credit" ? "+ " : "- "}रू. {Number(t.amount).toLocaleString()}</span>
+                                <span className="ml-2 text-gray-500 text-xs">{t.description}</span>
+                              </div>
+                              <span className="text-xs text-gray-400">{t.balance ? `ब्यालेन्स: रू. ${Number(t.balance).toLocaleString()}` : ""}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                  {/* Notifications */}
+                  <Card>
+                    <CardHeader><h3 className="font-semibold flex items-center gap-2"><Bell className="w-4 h-4" /> सूचनाहरू</h3></CardHeader>
+                    <CardBody>
+                      {activity.notifications.length === 0 ? <p className="text-sm text-gray-400">कुनै सूचना छैन।</p> : (
+                        <div className="space-y-2">
+                          {activity.notifications.map((n: any) => (
+                            <div key={n.id} className={`flex items-start gap-3 text-sm border-b border-gray-50 pb-2 ${!n.isRead ? "font-medium" : "text-gray-500"}`}>
+                              <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.isRead ? "bg-[var(--brand-primary)]" : "bg-gray-300"}`} />
+                              <div>
+                                <div className="text-gray-800">{n.title}</div>
+                                <div className="text-xs text-gray-400 mt-0.5">{n.message}</div>
+                              </div>
                             </div>
                           ))}
                         </div>

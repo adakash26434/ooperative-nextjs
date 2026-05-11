@@ -25,17 +25,19 @@ export default function MemberSurveyPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSubmitting(true);
     try {
-      const res = await fetch("/api/grievance", {
+      const res = await fetch("/api/member-survey", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           phone: form.phone,
-          subject: `सदस्य सर्वेक्षण — सन्तुष्टि: ${form.satisfaction}/5`,
-          description: `सदस्यता नं.: ${form.memberId || "—"}\nसुझाव: ${form.suggestion || "—"}\nगुनासो: ${form.complaint || "—"}`,
+          memberId: form.memberId,
+          satisfaction: Number(form.satisfaction),
+          suggestion: form.suggestion,
+          complaint: form.complaint,
         }),
       });
       const data = await res.json();
-      if (data.trackingId) { setDone(true); toast.success("सर्वेक्षण पठाइयो!"); }
+      if (res.ok) { setDone(true); toast.success("सर्वेक्षण पठाइयो!"); }
       else toast.error(data.error || "त्रुटि भयो।");
     } catch { toast.error("सर्भर त्रुटि।"); }
     finally { setSubmitting(false); }

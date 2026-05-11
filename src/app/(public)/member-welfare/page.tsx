@@ -25,13 +25,15 @@ export default function MemberWelfarePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSubmitting(true);
     try {
-      const res = await fetch("/api/grievance", {
+      const res = await fetch("/api/welfare-claim", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           phone: form.phone,
-          subject: `कल्याण दाबी — ${form.claimType}`,
-          description: `सदस्यता नं.: ${form.memberId}\nखाता नं.: ${form.bankAccount || "—"}\nविवरण: ${form.description}`,
+          memberId: form.memberId,
+          claimType: form.claimType,
+          description: form.description,
+          bankAccount: form.bankAccount,
         }),
       });
       const data = await res.json();
