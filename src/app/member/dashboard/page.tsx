@@ -12,7 +12,7 @@ import {
   Bell, LogOut, Home, Menu, X, CheckCircle,
 } from "lucide-react";
 
-type Tab = "overview" | "loans" | "kyc" | "grievance" | "profile";
+type Tab = "overview" | "loans" | "kyc" | "grievance" | "profile" | "activity";
 
 const LOAN_TYPES = [
   { value: "व्यक्तिगत ऋण", label: "व्यक्तिगत ऋण" },
@@ -32,6 +32,8 @@ export default function MemberDashboard() {
   const [grievanceForm, setGrievanceForm] = useState({ name: "", phone: "", subject: "", description: "" });
   const [submitting, setSubmitting] = useState(false);
   const [trackingResult, setTrackingResult] = useState<string | null>(null);
+  const [profileForm, setProfileForm] = useState({ name: "", phone: "", address: "", gender: "", currentPassword: "", newPassword: "" });
+  const [activity, setActivity] = useState<{ loans: any[]; kyc: any[]; grievances: any[] } | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("member_session");
@@ -41,6 +43,14 @@ export default function MemberDashboard() {
     setLoanForm((f) => ({ ...f, fullName: parsed.name || "", phone: parsed.phone || "" }));
     setGrievanceForm((f) => ({ ...f, name: parsed.name || "", phone: parsed.phone || "" }));
     setKycForm((f) => ({ ...f, fullName: parsed.name || "", phone: parsed.phone || "" }));
+    setProfileForm((f) => ({ ...f, name: parsed.name || "", phone: parsed.phone || "", address: parsed.address || "", gender: parsed.gender || "" }));
+    // fetch activity
+    if (parsed.id) {
+      fetch(`/api/member/profile?id=${parsed.id}`)
+        .then((r) => r.json())
+        .then((d) => setActivity({ loans: d.loanApplications || [], kyc: d.kycApplications || [], grievances: d.grievances || [] }))
+        .catch(() => {});
+    }
   }, [router]);
 
   function logout() {
@@ -80,8 +90,27 @@ export default function MemberDashboard() {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin" /></div>;
   }
 
+  async function saveProfile(e: React.FormEvent) {
+    e.preventDefault(); setSubmitting(true);
+    try {
+      const res = await fetch("/api/member/profile", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: session?.id, ...profileForm }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const updated = { ...session, ...data };
+        localStorage.setItem("member_session", JSON.stringify(updated));
+        setSession(updated);
+        toast.success("प्रोफाइल अपडेट भयो!");
+        setProfileForm((f) => ({ ...f, currentPassword: "", newPassword: "" }));
+      } else toast.error(data.error || "त्रुटि भयो।");
+    } catch { toast.error("सर्भर त्रुटि।"); } finally { setSubmitting(false); }
+  }
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: "overview",   label: "डासबोर्ड",  icon: <Home className="w-4 h-4" /> },
+    { key: "activity",   label: "गतिविधि",   icon: <Bell className="w-4 h-4" /> },
     { key: "loans",      label: "ऋण आवेदन",  icon: <CreditCard className="w-4 h-4" /> },
     { key: "kyc",        label: "KYC",        icon: <FileText className="w-4 h-4" /> },
     { key: "grievance",  label: "शिकायत",    icon: <MessageSquare className="w-4 h-4" /> },
@@ -285,37 +314,117 @@ export default function MemberDashboard() {
             </div>
           )}
 
+          {/* ACTIVITY */}
+          {activeTab === "activity" && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-5">मेरो गतिविधि</h2>
+              {!activity ? (
+                <div className="text-center py-10 text-gray-400">लोड हुँदैछ...</div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Loans */}
+                  <Card>
+                    <CardHeader><h3 className="font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4" /> ऋण आवेदनहरू</h3></CardHeader>
+                    <CardBody>
+                      {activity.loans.length === 0 ? <p className="text-sm text-gray-400">कुनै आवेदन छैन।</p> : (
+                        <div className="space-y-2">
+                          {activity.loans.map((l: any) => (
+                            <div key={l.id} className="flex items-center justify-between text-sm border-b border-gray-50 pb-2">
+                              <div>
+                                <span className="font-mono text-xs text-gray-400">{l.trackingId}</span>
+                                <span className="ml-2 text-gray-700">{l.loanType}</span>
+                              </div>
+                              <StatusBadge status={l.status} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                  {/* Grievances */}
+                  <Card>
+                    <CardHeader><h3 className="font-semibold flex items-center gap-2"><MessageSquare className="w-4 h-4" /> शिकायतहरू</h3></CardHeader>
+                    <CardBody>
+                      {activity.grievances.length === 0 ? <p className="text-sm text-gray-400">कुनै शिकायत छैन।</p> : (
+                        <div className="space-y-2">
+                          {activity.grievances.map((g: any) => (
+                            <div key={g.id} className="flex items-center justify-between text-sm border-b border-gray-50 pb-2">
+                              <div>
+                                <span className="font-mono text-xs text-gray-400">{g.trackingId}</span>
+                                <span className="ml-2 text-gray-700 line-clamp-1">{g.subject}</span>
+                              </div>
+                              <StatusBadge status={g.status} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* PROFILE */}
           {activeTab === "profile" && (
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-5">मेरो प्रोफाइल</h2>
-              <Card>
-                <CardBody>
-                  <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-                    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-[var(--brand-primary)] font-bold text-2xl">
-                      {session.name?.[0]?.toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="font-bold text-gray-900 text-lg">{session.name}</div>
-                      <div className="text-gray-500 text-sm">{session.email}</div>
-                      <StatusBadge status={session.approvalStatus || "pending"} />
-                    </div>
-                  </div>
-                  <dl className="space-y-3 text-sm">
-                    {[
-                      { label: "सदस्य नं.", value: session.sadasyataNumber },
-                      { label: "कार्ड नं.", value: session.memberCardNo },
-                      { label: "इमेल", value: session.email },
-                      { label: "फोन", value: session.phone },
-                    ].map((item) => item.value && (
-                      <div key={item.label} className="flex justify-between py-2 border-b border-gray-50">
-                        <dt className="text-gray-500">{item.label}</dt>
-                        <dd className="font-medium text-gray-900">{item.value}</dd>
+              <div className="space-y-5">
+                {/* Info card */}
+                <Card>
+                  <CardBody>
+                    <div className="flex items-center gap-4 pb-5 mb-5 border-b border-gray-100">
+                      <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-[var(--brand-primary)] font-bold text-2xl">
+                        {session.name?.[0]?.toUpperCase()}
                       </div>
-                    ))}
-                  </dl>
-                </CardBody>
-              </Card>
+                      <div>
+                        <div className="font-bold text-gray-900 text-lg">{session.name}</div>
+                        <div className="text-gray-500 text-sm">{session.email}</div>
+                        <StatusBadge status={session.approvalStatus || "pending"} />
+                      </div>
+                    </div>
+                    <dl className="space-y-2 text-sm">
+                      {[
+                        { label: "सदस्य नं.", value: session.sadasyataNumber },
+                        { label: "कार्ड नं.", value: session.memberCardNo },
+                        { label: "फोन", value: session.phone },
+                        { label: "इमेल", value: session.email },
+                      ].map((item) => item.value && (
+                        <div key={item.label} className="flex justify-between py-2 border-b border-gray-50">
+                          <dt className="text-gray-500">{item.label}</dt>
+                          <dd className="font-medium text-gray-900">{item.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </CardBody>
+                </Card>
+                {/* Edit form */}
+                <Card>
+                  <CardHeader><h3 className="font-semibold">प्रोफाइल सम्पादन</h3></CardHeader>
+                  <CardBody>
+                    <form onSubmit={saveProfile} className="space-y-4">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="नाम *" required value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} />
+                        <Input label="फोन *" required value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} />
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="ठेगाना" value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} />
+                        <Select label="लिङ्ग" value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
+                          placeholder="-- छान्नुहोस् --"
+                          options={[{ value: "male", label: "पुरुष" }, { value: "female", label: "महिला" }, { value: "other", label: "अन्य" }]} />
+                      </div>
+                      <div className="border-t border-gray-100 pt-4">
+                        <p className="text-xs text-gray-500 mb-3">पासवर्ड परिवर्तन (वैकल्पिक)</p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <Input label="पुरानो पासवर्ड" type="password" value={profileForm.currentPassword} onChange={(e) => setProfileForm({ ...profileForm, currentPassword: e.target.value })} />
+                          <Input label="नयाँ पासवर्ड" type="password" value={profileForm.newPassword} onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })} />
+                        </div>
+                      </div>
+                      <Button type="submit" loading={submitting}>सुरक्षित गर्नुहोस्</Button>
+                    </form>
+                  </CardBody>
+                </Card>
+              </div>
             </div>
           )}
 

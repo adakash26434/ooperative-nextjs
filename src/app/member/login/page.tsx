@@ -84,8 +84,11 @@ export default function MemberLoginPage() {
             </form>
 
             <div className="mt-6 pt-5 border-t border-gray-100 text-center space-y-2">
-              <Link href="/online-account" className="block text-sm text-[var(--brand-primary)] hover:underline">
-                नयाँ खाता खोल्नुहोस्
+              <Link href="/member/register" className="block text-sm text-[var(--brand-primary)] hover:underline font-medium">
+                  नयाँ सदस्यता दर्ता गर्नुहोस्
+              </Link>
+              <Link href="/online-account" className="block text-sm text-gray-400 hover:underline">
+                  अनलाइन खाता खोल्नुहोस्
               </Link>
               <Link href="/" className="block text-sm text-gray-400 hover:text-gray-600">
                 ← मुख्य वेबसाइटमा फिर्ता
