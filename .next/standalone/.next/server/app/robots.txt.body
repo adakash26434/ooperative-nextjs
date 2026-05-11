@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/admin/
+Disallow: /member/dashboard
+
+Sitemap: https://upakar.bandanasigdel.com.np/sitemap.xml
