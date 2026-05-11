@@ -59,6 +59,9 @@ export function Footer() {
                 { label: "समाचार", href: "/news" },
                 { label: "सूचना", href: "/notices" },
                 { label: "ग्यालरी", href: "/gallery" },
+                { label: "सम्मान / पुरस्कार", href: "/awards" },
+                { label: "विनिमय दर", href: "/exchange-rate" },
+                { label: "महत्त्वपूर्ण लिंक", href: "/important-links" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="hover:text-white transition-colors flex items-center gap-1">
