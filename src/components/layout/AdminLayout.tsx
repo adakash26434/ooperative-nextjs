@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Users, CreditCard, FileText,
   Bell, Settings, LogOut, Menu, X, MessageSquare,
   Briefcase, Download, Image, BookOpen, Shield,
+  HelpCircle, MapPin, Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,6 +25,9 @@ const navItems = [
   { href: "/admin/gallery",         label: "ग्यालरी",       icon: <Image className="w-4 h-4" /> },
   { href: "/admin/careers",         label: "क्यारियर",      icon: <Briefcase className="w-4 h-4" /> },
   { href: "/admin/downloads",       label: "डाउनलोड",       icon: <Download className="w-4 h-4" /> },
+  { href: "/admin/faqs",            label: "FAQs",           icon: <HelpCircle className="w-4 h-4" /> },
+  { href: "/admin/service-centers", label: "सेवा केन्द्र",   icon: <MapPin className="w-4 h-4" /> },
+  { href: "/admin/contact-messages",label: "सन्देश",         icon: <Mail className="w-4 h-4" /> },
   { href: "/admin/settings",        label: "सेटिङ",         icon: <Settings className="w-4 h-4" /> },
 ];
 
