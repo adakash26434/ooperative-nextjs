@@ -32,7 +32,7 @@ export default async function CareersPage() {
                 <div key={job.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">{job.titleNp || job.title}</h3>
+                      <a href={`/careers/${job.id}`} className="text-lg font-bold text-gray-900 hover:text-[var(--brand-primary)] transition-colors">{job.titleNp || job.title}</a>
                       <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
                         {job.department && <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{job.department}</span>}
                         {job.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>}
@@ -46,8 +46,8 @@ export default async function CareersPage() {
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <a href="/contact" className="inline-flex items-center gap-2 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
-                      आवेदन दिनुहोस्
+                    <a href={`/careers/${job.id}`} className="inline-flex items-center gap-2 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">
+                      विस्तृत जानकारी
                     </a>
                   </div>
                 </div>

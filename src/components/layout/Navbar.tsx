@@ -50,6 +50,8 @@ const navItems = [
       { label: "भेन्डर सूचीकरण", labelEn: "Vendor Enlistment", href: "/vendor-enlistment" },
       { label: "सदस्य सर्वेक्षण", labelEn: "Member Survey", href: "/member-survey" },
       { label: "सदस्य कल्याण", labelEn: "Member Welfare", href: "/member-welfare" },
+      { label: "लिलामी सूचना", labelEn: "Auction", href: "/auction" },
+      { label: "सदस्य प्रमाणीकरण", labelEn: "Verify Member", href: "/verify" },
       { label: "सम्पर्क", labelEn: "Contact", href: "/contact" },
     ],
   },
