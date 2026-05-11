@@ -12,6 +12,7 @@ const navItems = [
     children: [
       { label: "परिचय", labelEn: "Introduction", href: "/about" },
       { label: "संस्थागत प्रोफाइल", labelEn: "Institutional Profile", href: "/institutional-profile" },
+      { label: "डिजिटल सेवा", labelEn: "Digital Services", href: "/digital-services" },
       { label: "समिति", labelEn: "Committee", href: "/committees" },
       { label: "टोली", labelEn: "Team", href: "/team" },
     ],
@@ -21,7 +22,8 @@ const navItems = [
     children: [
       { label: "सबै सेवाहरू", labelEn: "All Services", href: "/services" },
       { label: "ब्याज दर", labelEn: "Interest Rates", href: "/interest-rates" },
-      { label: "डिजिटल सेवा", labelEn: "Digital Services", href: "/digital-services" },
+      { label: "ऋण आवेदन", labelEn: "Loan Apply", href: "/loan-apply" },
+      { label: "भेटघाट बुकिङ", labelEn: "Appointment", href: "/appointment" },
     ],
   },
   {
